@@ -58,31 +58,17 @@ def preprocessData():
     return trainingIterator,validationIterator,Xtrain,Ytrain
 
 def defineModel():
-    model = keras.Sequential()
-    model.add(Conv2D(64, (3, 3), activation='relu', kernel_initializer='he_uniform', padding='same', input_shape=(32, 32, 3)))
+    model=keras.Sequential()
+    model.add(Conv2D(32, (3, 3), activation='relu', kernel_initializer='he_uniform', padding='same', input_shape=(32,32,3)))
+    model.add(Conv2D(32, (3, 3), activation='relu', kernel_initializer='he_uniform', padding='same'))
+    model.add(MaxPooling2D((2,2)))
     model.add(Conv2D(64, (3, 3), activation='relu', kernel_initializer='he_uniform', padding='same'))
-    model.add(MaxPooling2D(pool_size=(2,2),strides=(2,2)))
-    model.add(Dropout(0.1))
-    model.add(Conv2D(128, (3, 3), activation='relu', kernel_initializer='he_uniform', padding='same'))
-    model.add(Conv2D(128, (3, 3), activation='relu', kernel_initializer='he_uniform', padding='same'))
-    model.add(MaxPooling2D(pool_size=(2,2),strides=(2,2)))
-    model.add(Dropout(0.13))
-    model.add(Conv2D(256, (3, 3), activation='relu', kernel_initializer='he_uniform', padding='same'))
-    model.add(Conv2D(256, (3, 3), activation='relu', kernel_initializer='he_uniform', padding='same'))
-    model.add(MaxPooling2D(pool_size=(2,2),strides=(2,2)))
-    model.add(Dropout(0.175))
-    model.add(Conv2D(512, (3, 3), activation='relu', kernel_initializer='he_uniform', padding='same'))
-    model.add(Conv2D(512, (3, 3), activation='relu', kernel_initializer='he_uniform', padding='same'))
-    model.add(MaxPooling2D(pool_size=(2,2),strides=(2,2)))
-    model.add(Dropout(0.2))
+    model.add(Conv2D(64, (3, 3), activation='relu', kernel_initializer='he_uniform', padding='same'))
+    model.add(MaxPooling2D(2,2))
     model.add(Flatten())
-    model.add(Dense(1024, activation='relu', kernel_initializer='he_uniform'))
-    model.add(Dropout(0.25))
-    model.add(Dense(512, activation='relu', kernel_initializer='he_uniform'))
-    model.add(Dropout(0.30))
-    
-    model.add(Dense(10, activation='softmax'))
-    model.compile(optimizer=Adam(learning_rate=0.0005),
+    model.add(Dense(128,activation='relu'))
+    model.add(Dense(10,activation='softmax'))
+    model.compile(optimizer=Adam(learning_rate=0.001),
     loss='categorical_crossentropy',metrics=['accuracy'])
     print(model.summary())
 
@@ -131,5 +117,4 @@ def makeNewModelAndTrain(epochs,saveModelBool,plotPerformance):
         pass
 
 
-for i in range(8):
-    resumeTraining(1,False)
+makeNewModelAndTrain(60,True,True)
