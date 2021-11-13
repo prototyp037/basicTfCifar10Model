@@ -4,13 +4,11 @@ from tensorflow.keras import optimizers
 from tensorflow.keras.layers import Dense,MaxPooling2D,Conv2D,Flatten,Input,Dropout
 from tensorflow.keras.optimizers import Adam
 from tensorflow.keras.preprocessing.image import ImageDataGenerator
+from tensorflow.keras.preprocessing.image import load_img,img_to_array
 from tensorflow.keras import models,layers
 import matplotlib.pyplot as plt
-import pandas
 import numpy
 import os
-from winsound import Beep
-
 
 def plotAccuracyAndLoss(history):
     # summarize history for accuracy
@@ -30,7 +28,7 @@ def plotAccuracyAndLoss(history):
     plt.legend(['train', 'test'], loc='upper left')
     plt.show()
 
-class_names = ['airplane', 'automobile', 'bird', 'cat', 'deer', 'dog', 'frog', 'horse', 'ship', 'truck']
+class_names = ['an airplane', 'an automobile', 'a bird', 'a cat', 'a deer', 'a dog', 'a frog', 'a horse', 'a ship', 'a truck']
 
 dataBatchSize=600
 
@@ -65,8 +63,12 @@ def defineModel():
     model.add(Conv2D(64, (3, 3), activation='relu', kernel_initializer='he_uniform', padding='same'))
     model.add(Conv2D(64, (3, 3), activation='relu', kernel_initializer='he_uniform', padding='same'))
     model.add(MaxPooling2D(2,2))
+    model.add(Conv2D(128,(3,3),activation='relu',padding='valid'))
+    model.add(Conv2D(128,(3,3),activation='relu',padding='valid'))
+    model.add(MaxPooling2D((2,2)))
     model.add(Flatten())
     model.add(Dense(128,activation='relu'))
+    model.add(Dense(32,activation='relu'))
     model.add(Dense(10,activation='softmax'))
     model.compile(optimizer=Adam(learning_rate=0.001),
     loss='categorical_crossentropy',metrics=['accuracy'])
@@ -117,4 +119,31 @@ def makeNewModelAndTrain(epochs,saveModelBool,plotPerformance):
         pass
 
 
-makeNewModelAndTrain(60,True,True)
+def detectObject(imagePath):
+    rawImage=load_img(imagePath,target_size=(32,32),interpolation='bicubic')
+    imageStuff=img_to_array(rawImage)
+    imageBatch=numpy.expand_dims(imageStuff,axis=0)
+    model=loadModel()
+    print('Cifar10Model is thinking...')
+    prediction=model.predict(imageBatch)
+    numOfClasses=len(class_names)#it's 10 bruh
+    indentNum=0
+    for i in range(numOfClasses):
+        if prediction[0][i] == 1:
+            indentNum=i
+        else:
+            i += 1
+    print(imagePath)
+    print('It\'s '+class_names[indentNum]+ '!')
+
+def detectInBulk(imageFolderPath):
+    for i in range(len(os.listdir(imageFolderPath))):
+        detectObject(imageFolderPath+'/'+os.listdir(imageFolderPath)[i])
+
+        
+
+
+
+
+#detectInBulk('C:\\Users\\037co\\OneDrive\\Desktop\\MyStuff\\PythonStuff\\aiStuff\\imagesStuff\\testImages(cifar10)')
+detectObject('imagesStuff/wolf.jpg')#full path is advised
