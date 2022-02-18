@@ -30,7 +30,7 @@ def plotAccuracyAndLoss(history):
 
 class_names = ['an airplane', 'an automobile', 'a bird', 'a cat', 'a deer', 'a dog', 'a frog', 'a horse', 'a ship', 'a truck']
 
-dataBatchSize=600
+dataBatchSize=32
 
 
 
@@ -57,18 +57,21 @@ def preprocessData():
 
 def defineModel():
     model=keras.Sequential()
-    model.add(Conv2D(32, (3, 3), activation='relu', kernel_initializer='he_uniform', padding='same', input_shape=(32,32,3)))
-    model.add(Conv2D(32, (3, 3), activation='relu', kernel_initializer='he_uniform', padding='same'))
+    model.add(Conv2D(32, (1, 1), activation='relu', kernel_initializer='he_uniform', padding='same', input_shape=(32,32,3)))
+    model.add(Conv2D(32, (1, 1), activation='relu', kernel_initializer='he_uniform', padding='same'))
+    model.add(Conv2D(30, (3, 3), activation='relu', kernel_initializer='he_uniform', padding='same'))
     model.add(MaxPooling2D((2,2)))
-    model.add(Conv2D(64, (3, 3), activation='relu', kernel_initializer='he_uniform', padding='same'))
-    model.add(Conv2D(64, (3, 3), activation='relu', kernel_initializer='he_uniform', padding='same'))
+    model.add(Conv2D(128, (3, 3), activation='relu', kernel_initializer='he_uniform', padding='same'))
+    model.add(Conv2D(256, (1, 1), activation='relu', kernel_initializer='he_uniform', padding='same'))
+    model.add(Conv2D(192, (3, 3), activation='relu', kernel_initializer='he_uniform', padding='same'))
     model.add(MaxPooling2D(2,2))
-    model.add(Conv2D(128,(3,3),activation='relu',padding='valid'))
-    model.add(Conv2D(128,(3,3),activation='relu',padding='valid'))
+    model.add(Conv2D(200,(1,1),activation='relu',padding='valid'))
+    model.add(Conv2D(192,(3,3),activation='relu',padding='valid'))
+    model.add(Conv2D(192,(3,3),activation='relu',padding='same'))
     model.add(MaxPooling2D((2,2)))
     model.add(Flatten())
-    model.add(Dense(128,activation='relu'))
-    model.add(Dense(32,activation='relu'))
+    model.add(Dense(512,activation='relu'))
+    model.add(Dense(512,activation='relu'))
     model.add(Dense(10,activation='softmax'))
     model.compile(optimizer=Adam(learning_rate=0.001),
     loss='categorical_crossentropy',metrics=['accuracy'])
@@ -82,7 +85,6 @@ def defineModel():
 def trainModel(epochSize,model):
     trainingIterator,validationIterator,Xtrain,Xtest=preprocessData()
     history=model.fit(trainingIterator,
-    batch_size=512,
     epochs=epochSize,
     validation_data=validationIterator,
     steps_per_epoch=len(Xtrain)/dataBatchSize,
@@ -119,8 +121,13 @@ def makeNewModelAndTrain(epochs,saveModelBool,plotPerformance):
         pass
 
 
-def detectObject(imagePath):
+def detectObject(imagePath,showImage):
     rawImage=load_img(imagePath,target_size=(32,32),interpolation='bicubic')
+    if showImage:
+
+        plt.imshow(rawImage)
+        plt.show()
+
     imageStuff=img_to_array(rawImage)
     imageBatch=numpy.expand_dims(imageStuff,axis=0)
     model=loadModel()
@@ -146,4 +153,6 @@ def detectInBulk(imageFolderPath):
 
 
 #detectInBulk('C:\\Users\\037co\\OneDrive\\Desktop\\MyStuff\\PythonStuff\\aiStuff\\imagesStuff\\testImages(cifar10)')
-detectObject('imagesStuff/wolf.jpg')#full path is advised
+print("you have the option to make and train your model and use it")
+
+
